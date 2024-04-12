@@ -1,3 +1,4 @@
+"use client";
 import React from "react";
 import { GraphCanvas } from "reagraph";
 import {
@@ -182,7 +183,7 @@ TestGraph.addEdge(nodeY, nodeX);
 TestGraph.addEdge(nodeAB, nodeAA);
 TestGraph.addEdge(nodeZ, nodeY);
 
-export function Graph() {
+export default function Graph() {
   console.log("GRAPH");
   console.log(TestGraph);
 

@@ -5,15 +5,11 @@ import ProgressBar from "./progress";
 
 // TODO: make a bunch of events that happen based on and prereqs
 // a big DAG to represent event dependencies
-const events = [
-  
-]
+const events = [];
 
 export function Simulation() {
   const [progress, setProgress] = useState(0);
   const [paused, setPaused] = useState(true);
-
-  
 
   return (
     <div className="flex min-h-screen flex-col items-center gap-8 p-8 w-full max-w-[1028px]">

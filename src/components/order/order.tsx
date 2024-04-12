@@ -1,4 +1,5 @@
-import { Graph } from "./graph";
+import dynamic from "next/dynamic";
+const Graph = dynamic(() => import("./graph"), { ssr: false });
 
 type Task = string;
 
