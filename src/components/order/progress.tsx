@@ -9,41 +9,53 @@ import {
 } from "@radix-ui/react-icons";
 import { useEffect, useState } from "react";
 
-export default function ProgressBar() {
-  const [progress, setProgress] = useState(0);
+interface ProgressBarProps {
+  progress: number;
+  setProgress: (value: React.SetStateAction<number>) => void;
+  setPaused: (value: React.SetStateAction<boolean>) => void;
+}
 
-  const [intervalId, setIntervalId] = useState<NodeJS.Timeout | null>(null); // To keep track of the interval
+export default function ProgressBar({
+  progress,
+  setProgress,
+  setPaused,
+}: ProgressBarProps) {
+  const [intervalId, setIntervalId] = useState<NodeJS.Timeout | null>(null);
 
-  const [progressJump, setProgressJump] = useState(1.0); // Initial interval time: 1000ms = 1 second
+  const [progressJump, setProgressJump] = useState(1.0);
 
   const increaseSpeed = () => {
     stopInterval();
-    // clearInterval(intervalId as NodeJS.Timeout);
 
     setProgressJump((prevProgJump) =>
       prevProgJump >= 100 ? prevProgJump : prevProgJump + 0.5
     );
-    startInterval();
   };
 
   const decreaseSpeed = () => {
     stopInterval();
-    // clearInterval(intervalId as NodeJS.Timeout);
     setProgressJump((prevProgJump) =>
       prevProgJump >= 100 ? prevProgJump : prevProgJump - 0.5
     );
-
-    startInterval();
   };
 
   const startInterval = () => {
     if (!intervalId) {
       const id = setInterval(() => {
         if (progress < 100) {
-          setProgress((prevProgress) => prevProgress + progressJump);
+          setProgress((prevProgress) => {
+            const newV = prevProgress + progressJump;
+
+            if (newV >= 100) {
+              setPaused(false);
+              return 100;
+            } else {
+              return newV;
+            }
+          });
+          setPaused(false);
         } else {
-          clearInterval(id);
-          setIntervalId(null);
+          stopInterval();
         }
       }, 1000);
       setIntervalId(id);
@@ -53,11 +65,15 @@ export default function ProgressBar() {
   const stopInterval = () => {
     clearInterval(intervalId as NodeJS.Timeout);
     setIntervalId(null);
+    if (progress < 100) {
+      setPaused(true);
+    }
   };
 
   const resetProgressBar = () => {
     stopInterval();
     setProgress(0);
+    setPaused(true);
   };
 
   useEffect(() => {
@@ -66,13 +82,8 @@ export default function ProgressBar() {
     };
   }, [intervalId]);
 
-  console.log(`progress: ${progress}`);
-  console.log(`progressJump: ${progressJump}`);
-
   const formatNumber = (number: number) => {
-    // Round the number to two decimal places and convert it to a string
     const formattedNumber = number.toFixed(2).toString();
-    // Add thousands separators if needed
     return formattedNumber.toLocaleString();
   };
 
@@ -102,6 +113,7 @@ export default function ProgressBar() {
           onClick={resetProgressBar}
         />
       </div>
+      <div>{`${formatNumber(progressJump)}% progress per second speed`}</div>
     </div>
   );
 }
